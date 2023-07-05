@@ -1,0 +1,34 @@
+﻿# Dossiers à ignorer
+bin/
+obj/
+
+# Fichiers de configuration Visual Studio
+*.suo
+*.user
+*.vs/
+*.vscode/
+
+# Fichiers de sortie de génération
+*.exe
+*.pdb
+*.dll
+*.manifest
+*.msi
+*.tmp
+*.log
+*.cache
+*.res
+
+# Dossiers spécifiques à certains outils
+_ReSharper*/
+packages/
+
+# Fichiers de sauvegarde
+*.bak
+*.backup
+*.swp
+
+# Fichiers de nuget
+*.nupkg
+*.nuspec
+*.snupkg
