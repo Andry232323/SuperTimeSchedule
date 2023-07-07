@@ -1,4 +1,7 @@
-﻿# Dossiers à ignorer
+﻿#Brouillon projet
+projet.txt
+
+# Dossiers à ignorer
 bin/
 obj/
 
