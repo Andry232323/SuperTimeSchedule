@@ -11,12 +11,12 @@ namespace SuperTimeSchedule.Controller
         public TopMenuStrip() 
         {
             Dock = DockStyle.Top;
-            populationMenuStrip();
+            PopulationMenuStrip();
         }
 
-        public void populationMenuStrip()
+        public void PopulationMenuStrip()
         {
-           ToolStripMenuItem item1 = new ToolStripMenuItem("Menu 1");
+           ToolStripMenuItem item1 = new("Menu 1");
 
            Items.Add(item1);
         }

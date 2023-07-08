@@ -1,11 +1,11 @@
-using SuperTimeSchedule.Controler;
 using SuperTimeSchedule.Controller;
-using System.Windows.Forms;
+using SuperTimeSchedule.View;
 
 namespace SuperTimeSchedule
 {
     public partial class MainForm : Form
     {
+        public MonthCalendar calendar;
         public MainForm()
         {
             InitializeComponent();
@@ -13,11 +13,13 @@ namespace SuperTimeSchedule
             var topMenuStrip = new TopMenuStrip();
             var splitContainerVertical = new SplitContainer();
             var splitContainerHorizontal = new SplitContainer();
-            var calendar = new MonthCalendar();
             var addEventButton = new Button();
+            calendar = new MonthCalendar
+            {
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
+                Dock = DockStyle.Fill
+            };
 
-            calendar.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            calendar.Dock = DockStyle.Fill;
 
             addEventButton.AutoSize = true;
             addEventButton.Anchor = AnchorStyles.Bottom;
@@ -30,16 +32,20 @@ namespace SuperTimeSchedule
             controlPanel.BackColor = Color.Beige;
             viewPanel.BackColor = Color.Beige;
 
-#pragma warning disable CS8622 // La nullabilité des types référence dans le type du paramètre ne correspond pas au délégué cible (probablement en raison des attributs de nullabilité).
-            addEventButton.Click += ButtonEventHandler.Add_Event;
-#pragma warning restore CS8622 // La nullabilité des types référence dans le type du paramètre ne correspond pas au délégué cible (probablement en raison des attributs de nullabilité).
+            addEventButton.Click += (s, e) => 
+            {
+                EventChoiceForm ChoiceForm = new(this);
+                ChoiceForm.ShowDialog();
+            };
 
             splitContainerVertical.Dock = DockStyle.Fill;
             splitContainerHorizontal.Dock = DockStyle.Fill;
             splitContainerVertical.Orientation = Orientation.Vertical;
             splitContainerHorizontal.Orientation = Orientation.Horizontal;
             splitContainerVertical.Panel2.Controls.Add(splitContainerHorizontal);
-            
+
+            controlPanel.AutoSize = true;
+            calendarPanel.AutoSize = true;
             controlPanel.Controls.Add(addEventButton);
             calendarPanel.Controls.Add(calendar);
             
