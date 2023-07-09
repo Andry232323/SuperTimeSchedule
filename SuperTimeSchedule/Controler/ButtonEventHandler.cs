@@ -10,14 +10,16 @@ namespace SuperTimeSchedule.Controler
 {
     public  class ButtonEventHandler
     {
+        private readonly MainForm _form;
         public ComboBox EventTypeComboBox;
         public TextBox NameTextBox;
         public RichTextBox DescrTextBox;
         public MonthCalendar calendar;
 
-        public ButtonEventHandler(EventChoiceForm eventChoiceForm, MonthCalendar calendar) 
+        public ButtonEventHandler(EventChoiceForm eventChoiceForm, MainForm form) 
         {
-            this.calendar = calendar;
+            this._form = form;
+            this.calendar = _form.calendar;
             this.EventTypeComboBox = eventChoiceForm.EventTypeComboBox;
             this.NameTextBox = eventChoiceForm.NameTextBox;
             this.DescrTextBox = eventChoiceForm.DescrTextBox;
@@ -27,10 +29,12 @@ namespace SuperTimeSchedule.Controler
         //TODO: faire le type de retour en Evenement du calendrier 
         public void Create_Event(Object sender, EventArgs e)
         {
-            CalendarEvent calendarEvent = new CalendarEvent(NameTextBox.Text, DescrTextBox.Text, EventTypeComboBox.SelectedItem.ToString(), calendar.SelectionStart, calendar.SelectionEnd);
+#pragma warning disable CS8604 // Existence possible d'un argument de référence null.
+            CalendarEvent calendarEvent = new(NameTextBox.Text, DescrTextBox.Text, EventTypeComboBox.SelectedItem.ToString(), calendar.SelectionStart, calendar.SelectionEnd);
+#pragma warning restore CS8604 // Existence possible d'un argument de référence null.
             Form parent = ((Button)sender).FindForm();
 
-            CalendarEventControler calendarEventControler = new(calendarEvent, calendar);
+            CalendarEventControler calendarEventControler = new(calendarEvent, _form);
             calendarEventControler.DisplayCalendarEvent();
 
             parent.Close();

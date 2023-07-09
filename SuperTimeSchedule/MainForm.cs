@@ -6,6 +6,9 @@ namespace SuperTimeSchedule
     public partial class MainForm : Form
     {
         public MonthCalendar calendar;
+        public Panel EventInfoPanel;
+        public Panel CalendarPanel;
+        public Panel ControlPanel;
         public MainForm()
         {
             InitializeComponent();
@@ -25,12 +28,13 @@ namespace SuperTimeSchedule
             addEventButton.Anchor = AnchorStyles.Bottom;
             addEventButton.Text = "Ajouter un évènement";
 
-            var calendarPanel = splitContainerHorizontal.Panel1;
-            var controlPanel = splitContainerVertical.Panel1 ;
-            var viewPanel = splitContainerHorizontal.Panel2;
+            CalendarPanel = splitContainerHorizontal.Panel1;
+            ControlPanel = splitContainerVertical.Panel1 ;
+            EventInfoPanel = splitContainerHorizontal.Panel2;
 
-            controlPanel.BackColor = Color.Beige;
-            viewPanel.BackColor = Color.Beige;
+            EventInfoPanel.Controls.Add(new EventInfoPanelModel());
+            ControlPanel.BackColor = Color.Beige;
+
 
             addEventButton.Click += (s, e) => 
             {
@@ -44,10 +48,10 @@ namespace SuperTimeSchedule
             splitContainerHorizontal.Orientation = Orientation.Horizontal;
             splitContainerVertical.Panel2.Controls.Add(splitContainerHorizontal);
 
-            controlPanel.AutoSize = true;
-            calendarPanel.AutoSize = true;
-            controlPanel.Controls.Add(addEventButton);
-            calendarPanel.Controls.Add(calendar);
+            ControlPanel.AutoSize = true;
+            CalendarPanel.AutoSize = true;
+            ControlPanel.Controls.Add(addEventButton);
+            CalendarPanel.Controls.Add(calendar);
             
             Controls.Add(splitContainerVertical);
             Controls.Add(topMenuStrip);

@@ -11,8 +11,7 @@ namespace SuperTimeSchedule.View
     public class EventChoiceForm : Form
     {
         private readonly MainForm _form;
-        private MonthCalendar _calendar;
-        private TextBox addTypeTextBox;
+        private readonly MonthCalendar _calendar;
         public ComboBox EventTypeComboBox;
         public TextBox NameTextBox;
         public RichTextBox DescrTextBox;
@@ -71,13 +70,16 @@ namespace SuperTimeSchedule.View
             };
 
             EventTypeComboBox.Items.AddRange(new string[] { "Anniversaire" });
+            EventTypeComboBox.SelectedIndex = 0;
 
             DescrTextBox.Size = new Size(250, 100);
 
-            ButtonEventHandler btnEvtHandler = new(this, _calendar);
+            ButtonEventHandler btnEvtHandler = new(this, _form);
             finalizeChoice.Text = "Créer l'évènement";
             finalizeChoice.AutoSize = true;
+#pragma warning disable CS8622 // La nullabilité des types référence dans le type du paramètre ne correspond pas au délégué cible (probablement en raison des attributs de nullabilité).
             finalizeChoice.Click += btnEvtHandler.Create_Event;
+#pragma warning restore CS8622 // La nullabilité des types référence dans le type du paramètre ne correspond pas au délégué cible (probablement en raison des attributs de nullabilité).
 
             flowPanel.Controls.AddRange(new Control[] {
                 nameLabel, NameTextBox, descrlabel, 
