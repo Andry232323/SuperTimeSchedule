@@ -1,4 +1,5 @@
 ﻿using SuperTimeSchedule.Controler;
+using SuperTimeSchedule.Model;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -15,8 +16,10 @@ namespace SuperTimeSchedule.View
         public ComboBox EventTypeComboBox;
         public TextBox NameTextBox;
         public RichTextBox DescrTextBox;
+        public CalendarEvent newCalendarEvent;
         public EventChoiceForm(MainForm form) 
         {
+            this.newCalendarEvent = new CalendarEvent();
             this._form = form;
             this._calendar = form.calendar;
             this.AutoSize = true;
@@ -66,7 +69,6 @@ namespace SuperTimeSchedule.View
                     EventTypeComboBox.SelectedItem = newType;
                     addTypeTextBox.Text = "";
                 }
-                //TODO: Enregistrer le nouveau type creer
             };
 
             EventTypeComboBox.Items.AddRange(new string[] { "Anniversaire" });
@@ -74,12 +76,22 @@ namespace SuperTimeSchedule.View
 
             DescrTextBox.Size = new Size(250, 100);
 
-            ButtonEventHandler btnEvtHandler = new(this, _form);
             finalizeChoice.Text = "Créer l'évènement";
             finalizeChoice.AutoSize = true;
-#pragma warning disable CS8622 // La nullabilité des types référence dans le type du paramètre ne correspond pas au délégué cible (probablement en raison des attributs de nullabilité).
-            finalizeChoice.Click += btnEvtHandler.Create_Event;
-#pragma warning restore CS8622 // La nullabilité des types référence dans le type du paramètre ne correspond pas au délégué cible (probablement en raison des attributs de nullabilité).
+            finalizeChoice.Click += (s, e) =>
+            {
+                List<DateTime> boldedDates = _calendar.BoldedDates.ToList();
+                for (DateTime date = _calendar.SelectionStart; date <= _calendar.SelectionEnd; date = date.AddDays(1))
+                {
+                    boldedDates.Add(date);
+                }
+                _calendar.BoldedDates = boldedDates.ToArray();
+
+                CalendarEvent newEvent = new(NameTextBox.Text, DescrTextBox.Text, EventTypeComboBox.SelectedItem.ToString(),_calendar.SelectionStart, _calendar.SelectionEnd);
+                _form.CalendarEvents.Add(newEvent);
+                Close();
+            };
+           
 
             flowPanel.Controls.AddRange(new Control[] {
                 nameLabel, NameTextBox, descrlabel, 
