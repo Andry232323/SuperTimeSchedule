@@ -10,13 +10,15 @@ namespace SuperTimeSchedule.Model
 {
     public class CalendarEvent
     {
-        private readonly string _DataPath = "C:\\Users\\Andry\\Desktop\\Lecon C#\\SuperTimeSchedule\\SuperTimeSchedule\\Data\\Data.json";
         public string Name;
         public string Descr;
         public string Type;
         public DateTime Start;
         public DateTime End;
 
+        /// <summary>
+        /// Create an empty CalendarEvent with no Name, no Description and no Type
+        /// </summary>
         public CalendarEvent() 
         {   
             Name = "";
@@ -24,6 +26,9 @@ namespace SuperTimeSchedule.Model
             Type = "";
         }
 
+        /// <summary>
+        /// Create a CalendarEvent
+        /// </summary>
         public CalendarEvent(string name, string descr, string type, DateTime start, DateTime end) 
         {
             Name = name;

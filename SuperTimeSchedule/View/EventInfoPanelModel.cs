@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SuperTimeSchedule.Controler;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,33 +11,21 @@ namespace SuperTimeSchedule.View
     public class EventInfoPanelModel : TableLayoutPanel
     {
 
-        public Label Namelabel = new();
-        public Label Descrlabel = new();
-        public Label StartDatelabel = new();
-        public Label EndDateLabel = new();
-        public Label EventTypelabel = new();
+        public LblResponsive Namelabel = new("Nom de l'évènement : ");
+        public LblResponsive Descrlabel = new("Description : ");
+        public LblResponsive StartDatelabel = new("Début : ");
+        public LblResponsive EndDateLabel = new("Fin : ");
+        public LblResponsive EventTypelabel = new("Type : ");
 
         public EventInfoPanelModel() 
         {
+            ///Panel style
             AutoSize = true;
             Dock = DockStyle.Fill;
             BackColor = Color.White;
             ColumnCount = 2;
             RowCount = 3;
             BorderStyle = BorderStyle.Fixed3D;
-
-            Namelabel.AutoSize = true;
-            Descrlabel.AutoSize = true;
-            StartDatelabel.AutoSize = true;
-            EndDateLabel.AutoSize = true;
-            EventTypelabel.AutoSize = true;
-
-            Namelabel.Text = "Nom de l'évènement : ";
-            Descrlabel.Text = "Description : ";
-            StartDatelabel.Text = "Début : ";
-            EndDateLabel.Text = "Fin : ";
-            EventTypelabel.Text = "Type : ";
-
 
             Controls.Add(Namelabel, 0, 0);
             Controls.Add(Descrlabel, 0, 1);

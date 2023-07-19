@@ -22,19 +22,26 @@ namespace SuperTimeSchedule.Controler
             _calendar = form.calendar;
         }
 
-        public CalendarEventControler(CalendarEvent calendarEvent, MainForm form) 
+        /// <summary>
+        /// Display peramantly the selected dates on the calendar
+        /// </summary>
+        /// <param name="calendar"></param>
+        public static void DisplayNewCalendarEvent(MonthCalendar calendar)
         {
-            _form = form;
-            _calendar = form.calendar;
-            _calendarEvent = calendarEvent;
+            List<DateTime> boldedDates = calendar.BoldedDates.ToList();
+            for (DateTime date = calendar.SelectionStart; date <= calendar.SelectionEnd; date = date.AddDays(1))
+            {
+                boldedDates.Add(date);
+            }
+            calendar.BoldedDates = boldedDates.ToArray();
+
         }
 
-        public void DisplayCalendarEvent()
-        {
-            for(DateTime date = _calendar.SelectionStart; date <= _calendar.SelectionEnd; date = date.AddDays(1)) { _calendar.AddBoldedDate(date); }
-            _calendar.UpdateBoldedDates(); 
-        }
-
+        /// <summary>
+        /// Display all the events on the calendar as bolded dates
+        /// </summary>
+        /// <param name="events"> List of CalendarEvent </param>
+        /// <param name="calendar">MonthCalendar</param>
         public static void DisplayCalendarEvent(List<CalendarEvent> events, MonthCalendar calendar)
         {
             foreach(CalendarEvent calendarEvent in events)
@@ -48,9 +55,14 @@ namespace SuperTimeSchedule.Controler
             calendar.UpdateBoldedDates();
         }
 
+        /// <summary>
+        /// Dislpays Name, Description, start DateTIme, end Date and Type of a CalendarEvent
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void DisplayCalendarEventInfo(Object sender, EventArgs e)
         {
-            EventInfoPanelModel infoPanel = _form.eventInfoPanelModel;
+            EventInfoPanelModel infoPanel = _form.EventInfoPanelModel;
             List<CalendarEvent> calendarEvents = _form.CalendarEvents;
             DateTime selectedStartDate = _calendar.SelectionStart;
 
@@ -63,9 +75,9 @@ namespace SuperTimeSchedule.Controler
                     _calendarEvent = calendarEvent;
                     infoPanel.Namelabel.Text = "Nom de l'évènement : " + _calendarEvent.Name;
                     infoPanel.Descrlabel.Text = "Description : " + _calendarEvent.Descr;
-                    infoPanel.EventTypelabel.Text = "Début : " + _calendarEvent.Type;
-                    infoPanel.StartDatelabel.Text = "Fin : " + _calendarEvent.Start.ToString();
-                    infoPanel.EndDateLabel.Text = "Type : " + _calendarEvent.End.ToString();
+                    infoPanel.EventTypelabel.Text = "Type : " + _calendarEvent.Type;
+                    infoPanel.StartDatelabel.Text = "Début : " + _calendarEvent.Start.ToString();
+                    infoPanel.EndDateLabel.Text = "Fin : " + _calendarEvent.End.ToString();
                     findEvent = true;
                     break;
                 }
@@ -81,5 +93,7 @@ namespace SuperTimeSchedule.Controler
 
             }
         }
+
+        
     }
 }
