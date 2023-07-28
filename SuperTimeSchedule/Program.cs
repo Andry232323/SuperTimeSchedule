@@ -1,3 +1,6 @@
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Drive.v3;
+
 namespace SuperTimeSchedule
 {
     internal static class Program
@@ -8,7 +11,10 @@ namespace SuperTimeSchedule
         static void Main()
         {
             ApplicationConfiguration.Initialize();
+
+            
             Application.Run(new MainForm());
+
         }
     }
 }

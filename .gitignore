@@ -35,3 +35,7 @@ packages/
 *.nupkg
 *.nuspec
 *.snupkg
+
+credentials.json
+token.json
+token/

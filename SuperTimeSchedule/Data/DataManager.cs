@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Google.Apis.Drive.v3;
+using Google.Apis.Drive.v3.Data;
 
 namespace SuperTimeSchedule.Data
 {
@@ -15,10 +17,18 @@ namespace SuperTimeSchedule.Data
         /// </summary>
         private static readonly string filePath = "C:\\Users\\Andry\\Desktop\\Lecon C#\\SuperTimeSchedule\\SuperTimeSchedule\\Data\\Data.json";
         private readonly List<CalendarEvent> _events;
+        private DriveService _driveService;
+        private readonly string _accessToken;
         public DataManager(List<CalendarEvent> events) 
         {
             _events = events;
         }    
+
+        public DataManager(DriveService driveService, string accessToken)
+        {
+            _accessToken = accessToken;
+            _driveService = driveService;
+        }
 
         /// <summary>
         /// Load all the CalendarEvent
@@ -29,8 +39,8 @@ namespace SuperTimeSchedule.Data
             List<CalendarEvent> calendarEvents;
             try
             {
-                if (File.Exists(filePath)) {
-                    string json = File.ReadAllText(filePath);
+                if (System.IO.File.Exists(filePath)) {
+                    string json = System.IO.File.ReadAllText(filePath);
                     if(JsonConvert.DeserializeObject<List<CalendarEvent>>(json) == null)
                     {
                         calendarEvents = new List<CalendarEvent>();
@@ -41,7 +51,7 @@ namespace SuperTimeSchedule.Data
                 } else
                 {
                     calendarEvents = new List<CalendarEvent>();
-                    File.Create(filePath).Dispose();
+                    System.IO.File.Create(filePath).Dispose();
                 }
             } catch (Exception ex)
             {
@@ -65,7 +75,7 @@ namespace SuperTimeSchedule.Data
             try
             {
                 string jsonContent = JsonConvert.SerializeObject(_events);
-                File.WriteAllText(filePath, jsonContent);
+                System.IO.File.WriteAllText(filePath, jsonContent);
                 MessageBox.Show("Donnée sauvegarder");
             } catch (Exception ex) 
             {
@@ -83,8 +93,8 @@ namespace SuperTimeSchedule.Data
             {
                 DialogResult result = MessageBox.Show("Etes vous sûr de suprimmer tous les évènements ? Cet action sera irréversible.", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if(result == DialogResult.Yes) 
-                { 
-                    File.WriteAllText(filePath, "");
+                {
+                    System.IO.File.WriteAllText(filePath, "");
                     _from.CalendarEvents.Clear();
                     _from.calendar.BoldedDates = null;
                     _from.calendar.UpdateBoldedDates();
@@ -136,6 +146,57 @@ namespace SuperTimeSchedule.Data
 
             }
 
+        }
+
+        public void SaveGOnDrive(string fileName, string fileContent, DriveService driveService)
+        {
+            var fileMetadata = new Google.Apis.Drive.v3.Data.File
+            {
+                Name = fileName,
+                MimeType = "application/json",
+            };
+            // Convertissez le contenu JSON en tableau d'octets
+            byte[] byteArray = Encoding.UTF8.GetBytes(fileContent);
+
+            // Envoyez le contenu du fichier sur Google Drive
+            using (var stream = new MemoryStream(byteArray))
+            {
+                try
+                {
+                    string fileId = GetFileIdByName(fileName);
+                    if (fileId != null)
+                    {
+                        driveService.Files.Delete(fileId).Execute();
+                    }
+                    var request = driveService.Files.Create(fileMetadata, stream, "application/json");
+                    request.Upload();
+                    MessageBox.Show("Sauvegarde dans le drive terminer avec succés !");
+                } catch(Exception e) 
+                {
+                    MessageBox.Show("Errreur lors de la sauvegarde dans le drive : " + e.Message);
+                }
+            }
+        }
+
+        public string GetFileIdByName(string fileName)
+        {
+            // Effectuez une requête pour rechercher le fichier par son nom
+            FilesResource.ListRequest listRequest = _driveService.Files.List();
+            listRequest.Fields = "files(id, name)";
+            listRequest.Q = $"name = '{fileName}' and trashed = false";
+            var fileList = listRequest.Execute();
+
+            // Vérifiez si le fichier a été trouvé
+            if (fileList.Files.Count > 0)
+            {
+                // Retournez l'ID du premier fichier trouvé
+                return fileList.Files[0].Id;
+            }
+            else
+            {
+                // Le fichier n'a pas été trouvé, retournez null ou lancez une exception
+                return null;
+            }
         }
     }
 }
