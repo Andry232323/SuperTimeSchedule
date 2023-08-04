@@ -15,11 +15,13 @@ namespace SuperTimeSchedule
 
             try
             {
-                bool isConnected = GoogleAuth.ConnectGoogle();
-                if(!isConnected) 
+                if(GoogleAuth.ConnectGoogleAsync().Result)
                 {
-                    DialogResult res = MessageBox.Show("Erreur lors de la connection avec Google, Voulez-vous restez en mode hors ligne ou quitter l'application ?", "Erreur de Connection", MessageBoxButtons.YesNo);
-                    if(res == DialogResult.No) { Environment.Exit(0); }
+                    Application.Run(new MainForm());
+                } else
+                {
+                    MessageBox.Show("Erreur lors du démarrage de l'application");
+                    Environment.Exit(0);
                 }
             }
             catch (Exception e)
@@ -28,7 +30,6 @@ namespace SuperTimeSchedule
                 Environment.Exit(0);
             }
 
-            Application.Run(new MainForm());
         }
     }
 }

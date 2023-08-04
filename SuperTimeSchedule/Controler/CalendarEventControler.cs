@@ -15,17 +15,21 @@ namespace SuperTimeSchedule.Controler
         private readonly MonthCalendar _calendar;
         private readonly MainForm _form;
 
+        /// <summary>
+        /// Constructor of the calendar's event handler
+        /// </summary>
+        /// <param name="form">The main form that contains the calendar</param>
         public CalendarEventControler(MainForm form)
         {
             _calendarEvent = new CalendarEvent();
             _form = form;
-            _calendar = form.calendar;
+            _calendar = form.Calendar;
         }
 
         /// <summary>
         /// Display peramantly the selected dates on the calendar
         /// </summary>
-        /// <param name="calendar"></param>
+        /// <param name="calendar">a calendar</param>
         public static void DisplayNewCalendarEvent(MonthCalendar calendar)
         {
             List<DateTime> boldedDates = calendar.BoldedDates.ToList();

@@ -33,7 +33,7 @@ namespace SuperTimeSchedule.View
             /*-------------------------------------------------------------------
              * ------------- Child Controls -------------------------------------
              * ----------------------------------------------------------------*/
-            _calendar = form.calendar;
+            _calendar = form.Calendar;
             
             var addTypeButton = new BtnResponsive("Créer le nouveau type");
             var finalizeChoiceButton = new BtnResponsive("Créer l'évènement");

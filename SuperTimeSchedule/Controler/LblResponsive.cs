@@ -9,10 +9,13 @@ namespace SuperTimeSchedule.Controler
 {
     public class LblResponsive : Label
     {
-        
-        public LblResponsive(string text) 
+        /// <summary>
+        /// A responsive label
+        /// </summary>
+        /// <param name="content">The label's content</param>
+        public LblResponsive(string content) 
         {
-            Text = text;
+            Text = content;
 
             ///Style
             AutoSize = true;

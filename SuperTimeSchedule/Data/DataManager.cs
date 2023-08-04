@@ -9,6 +9,8 @@ using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
+using System.ComponentModel;
+using System.Windows.Forms.VisualStyles;
 
 namespace SuperTimeSchedule.Data
 {
@@ -80,6 +82,7 @@ namespace SuperTimeSchedule.Data
             catch (Exception ex)
             {
                 MessageBox.Show("Erreur lors de la sauvegarde des donnée " + ex.Message);
+                return;
             }
         }
 
@@ -96,14 +99,15 @@ namespace SuperTimeSchedule.Data
                 {
                     System.IO.File.WriteAllText(filePath, "");
                     _from.CalendarEvents.Clear();
-                    _from.calendar.BoldedDates = null;
-                    _from.calendar.UpdateBoldedDates();
+                    _from.Calendar.BoldedDates = null;
+                    _from.Calendar.UpdateBoldedDates();
                     MessageBox.Show("Evenement suprimer !", "", MessageBoxButtons.OK);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Erreur lors de la supression des évènements " + ex);
+                return;
             }
         }
 
@@ -125,7 +129,7 @@ namespace SuperTimeSchedule.Data
                         _events.Remove(e);
 
                         //remove bolded date off the calendar
-                        List<DateTime> boldeDates = form.calendar.BoldedDates.ToList();
+                        List<DateTime> boldeDates = form.Calendar.BoldedDates.ToList();
                         List<DateTime> tmp = boldeDates.ToList();
                         foreach (var date in boldeDates)
                         {
@@ -135,8 +139,8 @@ namespace SuperTimeSchedule.Data
                             }
                         }
                         boldeDates = new List<DateTime>(tmp);
-                        form.calendar.BoldedDates = boldeDates.ToArray();
-                        form.calendar.UpdateBoldedDates();
+                        form.Calendar.BoldedDates = boldeDates.ToArray();
+                        form.Calendar.UpdateBoldedDates();
 
                         //delete the event from the json file
                         SaveData();
@@ -149,6 +153,10 @@ namespace SuperTimeSchedule.Data
 
         }
 
+        /// <summary>
+        /// Send to Google drive the json file that contain all event data
+        /// </summary>
+        /// <param name="credential">user credentials</param>
         public static void SendToDrive(UserCredential credential)
         {
             string fileId = "";
@@ -158,11 +166,19 @@ namespace SuperTimeSchedule.Data
                 ApplicationName = "SuperCalendar"
             });
 
-            FilesResource fileRessource = new(driveService);
+            try
+            {
+                FilesResource fileRessource = new(driveService);
 
-            FilesResource.ListRequest listRequest = fileRessource.List();
-            listRequest.Q = "trashed=false";
-            _fileList = listRequest.Execute();
+                FilesResource.ListRequest listRequest = fileRessource.List();
+                listRequest.Q = "trashed=false";
+                _fileList = listRequest.Execute();
+
+            } catch (Exception e)
+            {
+                MessageBox.Show("Erreur : " + e.Message);
+                return;
+            }
 
             bool fileExist = false;
             foreach (var file in _fileList.Files)
@@ -202,7 +218,9 @@ namespace SuperTimeSchedule.Data
             } catch(Exception ex)
             {
                 MessageBox.Show("Erreur lors de la sauvergarde vers google drive : " + ex.Message);
+                return;
             }
         }
+
     }
 }

@@ -11,14 +11,22 @@ namespace SuperTimeSchedule.Controller
     public class TopMenuStrip : MenuStrip
     {
         private readonly MainForm _form;
+        
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="form">the main form that contains the TopMenuStrip</param>
         public TopMenuStrip(MainForm form) 
         {
             _form = form;  
             Dock = DockStyle.Top;
-            PopulationMenuStrip();
+            InitMenuStrip();
         }
 
-        public void PopulationMenuStrip()
+        /// <summary>
+        /// Initialize the components of the TopMenuStrip
+        /// </summary>
+        public void InitMenuStrip()
         {
             ToolStripMenuItem Menu = new("Menu");
             

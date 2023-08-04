@@ -9,13 +9,17 @@ namespace SuperTimeSchedule.Controler
 {
     public class BtnResponsive : Button
     {
-        public BtnResponsive(string title) 
+        /// <summary>
+        /// A responsive button
+        /// </summary>
+        /// <param name="Content">The content of the button</param>
+        public BtnResponsive(string Content) 
         {
-            Text = title;
+            Text = Content;
 
             ///style
             AutoSize = true;
-            Text = title;
+            Text = Content;
         }
     }
 }

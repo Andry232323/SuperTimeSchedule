@@ -13,9 +13,11 @@ namespace SuperTimeSchedule.Data
 {
     public class GoogleAuth
     {
+        //Path of the client secret
         private readonly static string secretPath = "C:\\Users\\Andry\\Desktop\\Lecon C#\\SuperTimeSchedule\\SuperTimeSchedule\\client_secret.json";
         private static readonly string[] scopes = { DriveService.Scope.Drive , "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email" };
-        private static FileDataStore fileDataStore = new("C:\\Users\\Andry\\Desktop\\Lecon C#\\SuperTimeSchedule\\SuperTimeSchedule\\Data\\ConnectionData", false);
+        //Path of the folder which store the accesToken
+        private static readonly FileDataStore fileDataStore = new("C:\\Users\\Andry\\Desktop\\Lecon C#\\SuperTimeSchedule\\SuperTimeSchedule\\Data\\ConnectionData", false);
         public static UserCredential UserCredential { get; set; }
         public static User_Calendar User { get; set; }
 
@@ -23,7 +25,7 @@ namespace SuperTimeSchedule.Data
         /// Connect to Google by OAuth2.0 Async
         /// </summary>
         /// <returns></returns>
-        public static async Task ConnectGoogleAsync()
+        public static async Task<bool> ConnectGoogleAsync()
         {
             try
             {
@@ -37,38 +39,22 @@ namespace SuperTimeSchedule.Data
                         );
 
                 }
-                 User = new User_Calendar(UserCredential);
+                if (UserCredential != null)
+                {
+                    User = new User_Calendar(UserCredential);
+                    MessageBox.Show("Connexion avec Google réussie !");
+                    return true;
+                }
+                else
+                {
+                    MessageBox.Show("Échec de la connexion avec Google.");
+                    return false;
+                }
             } catch (Exception ex)
             {
                 MessageBox.Show("Erreur lors de la connection avec google : " + ex.Message);
+                return false;
             }
-        }
-
-
-        public static bool ConnectGoogle()
-        {
-            try
-            {
-                using (var stream = new FileStream(secretPath, FileMode.Open, FileAccess.Read))
-                {
-                    Task<Task<UserCredential>> res = Task.Run
-                    ( async() => GoogleWebAuthorizationBroker.AuthorizeAsync
-                        (
-                        GoogleClientSecrets.Load(stream).Secrets, scopes,
-                        "user", CancellationToken.None,
-                        fileDataStore
-                        )
-                    );
-                    UserCredential = res.Result.Result;
-                }
-                User = new User_Calendar(UserCredential);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Erreur lors de la connection avec google : " + ex.Message);
-            }
-
-            return UserCredential != null;
         }
 
         /// <summary>
@@ -87,6 +73,7 @@ namespace SuperTimeSchedule.Data
             } catch (Exception ex)
             {
                 MessageBox.Show("erreur lors de la deconnection : " + ex.Message);
+                return;
             }
         }
 

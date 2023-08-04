@@ -11,8 +11,12 @@ namespace SuperTimeSchedule.Model
 {
     public class User_Calendar
     {
-        public string Name { get; }
+        public string Name { get; set; }
 
+        /// <summary>
+        /// Constructor of User_Calendar
+        /// </summary>
+        /// <param name="credential"> user's credentials</param>
         public User_Calendar(UserCredential credential)
         {
             var service = new Oauth2Service(new BaseClientService.Initializer

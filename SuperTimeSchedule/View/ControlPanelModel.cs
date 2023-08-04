@@ -24,7 +24,7 @@ namespace SuperTimeSchedule.View
         private readonly LblResponsive _deleteEventLbl;
         private readonly LblResponsive _User_Name;
 
-        private MainForm _form;
+        private readonly MainForm _form;
         
         private readonly TextBox _deleteTextBox;
 
@@ -40,15 +40,13 @@ namespace SuperTimeSchedule.View
             _deleteEventBtn = new("suprimer l'évènement");
             _addEventBtn = new BtnResponsive("Ajouter un évènement");
 
-            /*_user = GoogleAuth.user;
-            _User_Name = new("Bonjour "+ _user.name + "\n");
-            */
             _deleteEventLbl = new("nom de l'évènement : ");
             
             _deleteTextBox = new();
             
             _form = form;
-            
+
+            /*---------------------------------Event-Handling-------------------------------------------------*/
             _deleteEventBtn.Click += (s, e) =>
             {
                 DataManager dataManager = new(_form.CalendarEvents);
@@ -67,7 +65,8 @@ namespace SuperTimeSchedule.View
             _disconnectGoogle.Click += (s, e) => { GoogleAuth.DisconnectGoogleAsync(); };
 
             _saveOnDrivebtn.Click += (s, e) => { DataManager.SendToDrive(GoogleAuth.UserCredential); };
-
+            /*---------------------------------------------------------------------------------------------------*/
+           
             Controls.AddRange(new Control[] { _User_Name, _deleteEventLbl, _deleteTextBox, _deleteEventBtn, _addEventBtn, _connectGoogle, _disconnectGoogle, _saveOnDrivebtn });
         }
     }
