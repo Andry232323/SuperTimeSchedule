@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Services;
 
 namespace SuperTimeSchedule.Data
 {
@@ -17,43 +19,40 @@ namespace SuperTimeSchedule.Data
         /// </summary>
         private static readonly string filePath = "C:\\Users\\Andry\\Desktop\\Lecon C#\\SuperTimeSchedule\\SuperTimeSchedule\\Data\\Data.json";
         private readonly List<CalendarEvent> _events;
-        private DriveService _driveService;
-        private readonly string _accessToken;
-        public DataManager(List<CalendarEvent> events) 
+        private static FileList _fileList;
+        public DataManager(List<CalendarEvent> events)
         {
             _events = events;
-        }    
-
-        public DataManager(DriveService driveService, string accessToken)
-        {
-            _accessToken = accessToken;
-            _driveService = driveService;
         }
 
         /// <summary>
         /// Load all the CalendarEvent
         /// </summary>
         /// <returns></returns>
-        public static List<CalendarEvent>  LoadData()
+        public static List<CalendarEvent> LoadData()
         {
             List<CalendarEvent> calendarEvents;
             try
             {
-                if (System.IO.File.Exists(filePath)) {
+                if (System.IO.File.Exists(filePath))
+                {
                     string json = System.IO.File.ReadAllText(filePath);
-                    if(JsonConvert.DeserializeObject<List<CalendarEvent>>(json) == null)
+                    if (JsonConvert.DeserializeObject<List<CalendarEvent>>(json) == null)
                     {
                         calendarEvents = new List<CalendarEvent>();
-                    } else
+                    }
+                    else
                     {
                         calendarEvents = JsonConvert.DeserializeObject<List<CalendarEvent>>(json);
                     }
-                } else
+                }
+                else
                 {
                     calendarEvents = new List<CalendarEvent>();
                     System.IO.File.Create(filePath).Dispose();
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 calendarEvents = new List<CalendarEvent>();
                 MessageBox.Show(ex.Message);
@@ -64,9 +63,9 @@ namespace SuperTimeSchedule.Data
         /// <summary>
         /// Save all the CalendarEvent on a Json file 
         /// </summary>
-        public void SaveData() 
+        public void SaveData()
         {
-            if(_events == null)
+            if (_events == null)
             {
                 MessageBox.Show("Aucun évènement à sauvegarder");
                 return;
@@ -77,7 +76,8 @@ namespace SuperTimeSchedule.Data
                 string jsonContent = JsonConvert.SerializeObject(_events);
                 System.IO.File.WriteAllText(filePath, jsonContent);
                 MessageBox.Show("Donnée sauvegarder");
-            } catch (Exception ex) 
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show("Erreur lors de la sauvegarde des donnée " + ex.Message);
             }
@@ -92,15 +92,16 @@ namespace SuperTimeSchedule.Data
             try
             {
                 DialogResult result = MessageBox.Show("Etes vous sûr de suprimmer tous les évènements ? Cet action sera irréversible.", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if(result == DialogResult.Yes) 
+                if (result == DialogResult.Yes)
                 {
                     System.IO.File.WriteAllText(filePath, "");
                     _from.CalendarEvents.Clear();
                     _from.calendar.BoldedDates = null;
                     _from.calendar.UpdateBoldedDates();
-                    MessageBox.Show("Evenement suprimer !", "",MessageBoxButtons.OK);
+                    MessageBox.Show("Evenement suprimer !", "", MessageBoxButtons.OK);
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show("Erreur lors de la supression des évènements " + ex);
             }
@@ -125,7 +126,7 @@ namespace SuperTimeSchedule.Data
 
                         //remove bolded date off the calendar
                         List<DateTime> boldeDates = form.calendar.BoldedDates.ToList();
-                        List<DateTime> tmp =boldeDates.ToList();
+                        List<DateTime> tmp = boldeDates.ToList();
                         foreach (var date in boldeDates)
                         {
                             if (date >= e.Start && date <= e.End)
@@ -148,54 +149,59 @@ namespace SuperTimeSchedule.Data
 
         }
 
-        public void SaveGOnDrive(string fileName, string fileContent, DriveService driveService)
+        public static void SendToDrive(UserCredential credential)
         {
-            var fileMetadata = new Google.Apis.Drive.v3.Data.File
+            string fileId = "";
+            DriveService driveService = new(new BaseClientService.Initializer()
             {
-                Name = fileName,
-                MimeType = "application/json",
-            };
-            // Convertissez le contenu JSON en tableau d'octets
-            byte[] byteArray = Encoding.UTF8.GetBytes(fileContent);
+                HttpClientInitializer = credential,
+                ApplicationName = "SuperCalendar"
+            });
 
-            // Envoyez le contenu du fichier sur Google Drive
-            using (var stream = new MemoryStream(byteArray))
+            FilesResource fileRessource = new(driveService);
+
+            FilesResource.ListRequest listRequest = fileRessource.List();
+            listRequest.Q = "trashed=false";
+            _fileList = listRequest.Execute();
+
+            bool fileExist = false;
+            foreach (var file in _fileList.Files)
             {
-                try
+                if(file.Name == "Data.json")
                 {
-                    string fileId = GetFileIdByName(fileName);
-                    if (fileId != null)
-                    {
-                        driveService.Files.Delete(fileId).Execute();
-                    }
-                    var request = driveService.Files.Create(fileMetadata, stream, "application/json");
-                    request.Upload();
-                    MessageBox.Show("Sauvegarde dans le drive terminer avec succés !");
-                } catch(Exception e) 
-                {
-                    MessageBox.Show("Errreur lors de la sauvegarde dans le drive : " + e.Message);
+                    fileExist = true;
+                    fileId = file.Id;
+                    break;
                 }
             }
-        }
-
-        public string GetFileIdByName(string fileName)
-        {
-            // Effectuez une requête pour rechercher le fichier par son nom
-            FilesResource.ListRequest listRequest = _driveService.Files.List();
-            listRequest.Fields = "files(id, name)";
-            listRequest.Q = $"name = '{fileName}' and trashed = false";
-            var fileList = listRequest.Execute();
-
-            // Vérifiez si le fichier a été trouvé
-            if (fileList.Files.Count > 0)
+            
+            var fileMetadata = new Google.Apis.Drive.v3.Data.File
             {
-                // Retournez l'ID du premier fichier trouvé
-                return fileList.Files[0].Id;
-            }
-            else
+                Name = System.IO.Path.GetFileName(filePath)
+            };
+
+            try
             {
-                // Le fichier n'a pas été trouvé, retournez null ou lancez une exception
-                return null;
+                if (!fileExist)
+                {
+                    using var stream = new System.IO.FileStream(filePath, System.IO.FileMode.Open);
+                    var request = driveService.Files.Create(fileMetadata, stream, "application/octet-stream");
+                    request.Fields = "id";
+                    request.Upload();
+                }
+                else
+                {
+                    driveService.Files.Delete(fileId).Execute();
+                    using var stream = new System.IO.FileStream(filePath, System.IO.FileMode.Open);
+                    var request = driveService.Files.Create(fileMetadata, stream, "application/octet-stream");
+                    request.Fields = "id";
+                    request.Upload();
+                }
+
+                MessageBox.Show("Sauvegarde vers google drive effectué avec succes !");
+            } catch(Exception ex)
+            {
+                MessageBox.Show("Erreur lors de la sauvergarde vers google drive : " + ex.Message);
             }
         }
     }

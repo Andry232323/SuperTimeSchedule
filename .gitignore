@@ -39,3 +39,4 @@ packages/
 credentials.json
 token.json
 token/
+client_secret.json
